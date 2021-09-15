@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./index.css">
+    <link rel="stylesheet" href="./icon/themify-icons-font/themify-icons/themify-icons.css">
+</head>
+<body>
+    <div class="main">
+        <div class="header">
+                <div class="theSong">
+                    <p>Now playing:</p>
+                    <h1>Song</h1>
+                </div>
+                <div class="imgSong">
+                    <img class="imgSong1" src="./access/img/img8.jpg" style="border-radius:50%">
+                </div>
+                <div class="control">
+                    <div class="control_1 only_song">
+                        <i class="ti-reload"></i>
+                    </div>
+                    <div class="control_2">
+                        <div class="control_2-1 control_left"><i class="ti-control-skip-backward"></i></div>
+                        <div class="control_3">
+                            <div class="control_2-1 control_4 icon_play"><i class="ti-control-play"></i></div>
+                            <div class="control_2-1 control_4 icon_pause playing  "><i class="ti-control-pause"></i></div>
+                         </div>
+                        <div class="control_2-1 control_right"><i class="ti-control-skip-forward"></i></div>
+                    </div>
+                    <div class="control_1 randomClick">
+                        <i class="ti-control-shuffle"></i>
+                    </div>
+                </div>
+                <input type="range" id="progress" class="progress" value="0" step="1" min="1" max="100">
+                <audio id="audio" src=""></audio>
+        </div>
+        <div class="playlist">
+             <!-- danh sách bài hát -->
+        </div>
+    </div>
+    <script>    
+        const $= document.querySelector.bind(document);
+        const $$= document.querySelectorAll.bind(document);
+        const heading =$('.theSong h1')
+        const imgSong =$('.imgSong1')
+        const audio = $('#audio') 
+        const controlLeft = $('.control_left')
+        const controlRight = $('.control_right')
+         const cd= $('.imgSong')
+         const playBtn =$('.control_3')
+         const onPlay = $('.icon_play')
+         const onPause = $('.icon_pause')
+         const progress = $('#progress')
+         const random = $('.randomClick')
+         const onlySong = $('.only_song')
+         const playList = $('.playlist')
+        const app = {
+            currentIndex :0,
+            isPlaying: false,
+            isRandom: true,
+            isOnly: true,
+            songs: [
+                {
+                    name:'Bắc kim thang',
+                    singer:'Ricky Star',
+                    path:'./access/audio/song1.mp3',
+                    img:'./access/img/img1.jfif'
+                },
+                {
+                    name:'Tát nhật lăng rực rỡ',
+                    singer:'Mạnh Đạt',
+                    path:'./access/audio/song2.mp3',
+                    img:'./access/img/img2.jfif'
+                },
+                {
+                    name:'Thức giấc',
+                    singer:'Da-lab',
+                    path:'./access/audio/song3.mp3',
+                    img:'./access/img/img3.jpg'
+                },
+                {
+                    name:'Trên tình bạn dưới tình yêu',
+                    singer:'Min',
+                    path:'./access/audio/song4.mp3',
+                    img:'./access/img/img4.jfif'
+                },
+                {
+                    name:'Như ngày hôm qua',
+                    singer:'Sơn Tùng M-TP',
+                    path:'./access/audio/song5.mp3',
+                    img:'./access/img/img5.jfif'
+                },
+                {
+                    name:'Muộn rồi mà sao còn',
+                    singer:'Sơn Tùng M-TP',
+                    path:'./access/audio/song6.mp3',
+                    img:'./access/img/img6.jpg'
+                },
+                {
+                    name:'Lối nhỏ',
+                    singer:'Đen Vâu',
+                    path:'./access/audio/song7.mp3',
+                    img:'./access/img/img7.jpg'
+                },
+                {
+                    name:'Hay trao cho anh',
+                    singer:'Sơn Tùng M-TP',
+                    path:'./access/audio/song8.mp3',
+                    img:'./access/img/img8.jpg'
+                },
+                {
+                    name:'Hạ còn vương nắng',
+                    singer:'Đat Kaa',
+                    path:'./access/audio/song9.mp3',
+                    img:'./access/img/img9.jfif'
+                },
+                {
+                    name:'Đau để trưởng thành',
+                    singer:'Only C',
+                    path:'./access/audio/song10.mp3',
+                    img:'./access/img/img10.jfif'
+                }
+            ],
+            render: function(){
+                const htmls = this.songs.map(function(song, index){
+                    return `
+                    <div data-index="${index}" class="infSong ${index === app.currentIndex ? 'active1' : ''}">
+                <div class="image">
+                    <img class= "image1" src="${song.img}">
+                </div>
+                <div class="name">
+                    <h3>${song.name}</h3>
+                    <p>${song.singer}</p>
+                </div>
+                <div class="icon">
+                    <i class="ti-more-alt"></i>
+                </div>
+            </div>
+                    `
+                })
+                $('.playlist').innerHTML = htmls.join(' ')
+            }, 
+            defineProperties: function(){
+                Object.defineProperty(this,'currentSong',{
+                    get: function(){
+                        return this.songs[this.currentIndex]
+                    }
+                })
+            },
+            handleEvents: function(){
+                const _this= this
+                const cdimg = $('.imgSong1')
+                const cdHeight = cd.offsetHeight;
+                const cdimgHeight = cdimg.offsetHeight;
+                document.onscroll = function(){
+                    const scrollTop = document.documentElement.scrollTop
+                    const newCdHeight = cdHeight - scrollTop
+                    const newCdImgHeight = cdimgHeight - scrollTop
+                    cdimg.style.height = newCdImgHeight > 0 ? newCdImgHeight + 'px' : 0
+                    cd.style.height= newCdHeight > 0 ? newCdHeight + 'px' : 0
+                    cdimg.style.opacity = newCdImgHeight / cdimgHeight 
+                    cd.style.width = cd.style.height
+                    cdimg.style.width = cdimg.style.height
+                }
+                const imgSongAnimate = imgSong.animate([
+                    {
+                        transform: 'rotate(360deg)'}
+                ],{
+                    duration:15000,
+                    iterations: Infinity
+                })
+                imgSongAnimate.pause(),
+                playBtn.onclick = function(){
+                    if(_this.isPlaying){
+                        _this.isPlaying = false
+                        audio.pause()
+                       onPlay.classList.remove('playing')
+                       onPause.classList.add('playing')
+                    imgSongAnimate.pause()
+                    }
+                    else {
+                        _this.isPlaying = true
+                        audio.play()
+                        onPlay.classList.add('playing')
+                        onPause.classList.remove('playing')
+                       imgSongAnimate.play()
+                    }
+                }
+                controlRight.onclick = function() {
+                    if(_this.isRandom == false){
+                        _this.randomSong()
+                    }else{
+                    if(_this.isOnly == false){
+                        _this.theOnlySong()
+                    }else{
+                        _this.nextSong()
+                    }
+                }
+             
+                    onPause.classList.add('playing')
+                    onPlay.classList.remove('playing')
+                    _this.render()  
+                     _this. scrollToActiveSong()
+                    setTimeout(function(){
+                        onPlay.classList.add('playing')
+                        onPause.classList.remove('playing')
+                        imgSongAnimate.play()
+                        audio.play()
+                    },1000)
+                }
+                controlLeft.onclick = function() {
+                    if(_this.isRandom == false){
+                        _this.randomSong()
+                    }else{
+                    if(_this.isOnly == false){
+                        _this.theOnlySong()
+                    }else{
+                        _this.backSong()
+                    }
+                }
+                onPause.classList.add('playing')
+                onPlay.classList.remove('playing')
+                _this.render()
+                _this. scrollToActiveSong() 
+                    setTimeout(function(){
+                        onPlay.classList.add('playing')
+                        onPause.classList.remove('playing')
+                        imgSongAnimate.play()
+                        audio.play()
+                    },1000)
+                }
+                audio.ontimeupdate= function() { 
+                    if(audio.duration){
+                         const   progressPercent = Math.floor(audio.currentTime / audio.duration *100)
+                        progress.value = progressPercent
+                        
+                }
+                progress.oninput = function(e) {
+                    audio.currentTime = e.target.value * audio.duration /100
+                }
+           }
+                random.onclick = function() {
+                    if(_this.isRandom){
+                        _this.isOnly = true
+                        onlySong.classList.remove('active')
+                        _this.isRandom = false
+                        random.classList.add('active')
+                       
+                        
+                    }else{
+                         _this.isRandom = true
+                        random.classList.remove('active')
+                    } 
+               
+                }
+                onlySong.onclick = function(){
+                    if(_this.isOnly){  
+                        _this.isRandom = true
+                        random.classList.remove('active')
+                         _this.isOnly = false
+                        onlySong.classList.add('active')
+                     
+                    }else{
+                        _this.isOnly = true
+                        onlySong.classList.remove('active')
+                    }
+                    
+                }
+                audio.onended = function(){
+                    if(_this.isRandom == false){
+                        _this.randomSong()
+                    }else{
+                    if(_this.isOnly == false){
+                        _this.theOnlySong()
+                    }else{
+                        _this.nextSong()
+                    }
+                }
+                audio.play()
+                _this.render()
+            } 
+            playList.onclick = function(e){
+                if(e.target.closest('.infSong:not(.active1)') || e.target.closest('.icon')){
+                    // xu li khi click bai hat
+                    if(e.target.closest('.infSong:not(.active1)')){
+                        _this.currentIndex = Number(e.target.closest('.infSong:not(.active1)').dataset.index)
+                        _this.loadCurrentSong()
+                        audio.play()
+                        _this.render()
+                    }
+                }
+            }
+                    
+        },
+            
+           loadCurrentSong: function(){
+                heading.textContent = this.currentSong.name
+                imgSong.src = this.currentSong.img
+                audio.src = this.currentSong.path
+           },
+           nextSong: function(){
+               this.currentIndex++
+               if(this.currentIndex > this.songs.length){
+                   this.currentIndex = 0
+               }
+               this.loadCurrentSong()
+           },
+           backSong: function(){
+               this.currentIndex--
+               if(this.currentIndex <0){
+                   this.currentIndex = this.songs.length
+               }
+               this.loadCurrentSong()
+           },
+           scrollToActiveSong: function(){
+                $('.infSong.active1').scrollIntoView({
+                    behavior: 'smooth',
+                    block:'nearest',
+                })
+           },
+           randomSong: function() {
+               let newIndex
+                do{
+                    newIndex = Math.floor(Math.random() * this.songs.length)
+                } while(newIndex === this.currentIndex)
+                this.currentIndex = newIndex,
+                this.loadCurrentSong()
+           },
+           clickSong:function() {
+                playList.forEach(function(song,index){
+                    song.onclick = function(){
+                        this.classList.add('active1')
+                    }
+                })
+           },
+           theOnlySong: function() {
+            let newIndex
+                do{
+                    newIndex = Math.floor(Math.random() * this.songs.length)
+                } while(newIndex !== this.currentIndex)
+                this.currentIndex = newIndex,
+                this.loadCurrentSong()
+           },
+            start: function(){
+                    this.defineProperties()
+                    this.handleEvents()
+                    this.loadCurrentSong()
+                    this.render()
+                   
+                            }
+        }
+        app.start();
+    </script>
+</body>
+</html>
